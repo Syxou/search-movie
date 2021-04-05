@@ -3,6 +3,7 @@ import * as cors from 'cors';
 import * as bodyParser from "body-parser";
 import * as dotenv from 'dotenv';
 import * as logger from 'morgan';
+import * as cookieParser from 'cookie-parser';
 
 import movieRouter from './controller/movie/movie.router';
 import userRouter from './controller/user/user.router';
@@ -17,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/movies', movieRouter);
-app.use(userRouter);
+app.use('/user', userRouter);
 
 app.use((error: express.ErrorRequestHandler, _: any, res: express.Response, __: any) => {
     console.log(

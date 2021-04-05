@@ -1,13 +1,21 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import styled from 'styled-components';
 import Card from './components/Card/Card';
 import Nav from './components/Nav/Nav';
 import { selectMovies } from './slice/moviesSlice';
+import { heckLogin } from './slice/serviceSlice';
+
 
 const App: React.FC = () => {
+    const dispatch = useDispatch();
     const { movies } = useSelector(selectMovies);
+
+    useEffect(() => {
+        dispatch(heckLogin())
+    }, [dispatch])
+
     console.log('movies', movies)
     return (
         <main>

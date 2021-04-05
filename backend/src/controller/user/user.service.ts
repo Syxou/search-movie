@@ -3,13 +3,14 @@ import { User } from "./User.entity";
 const client = new OAuth2Client('1005266927467-r75m0g9pn25q1vkob3hls1h1hvrq4981.apps.googleusercontent.com');
 
 export const authGoogle = async (token: string): Promise<User | number> => {
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: '1005266927467-r75m0g9pn25q1vkob3hls1h1hvrq4981.apps.googleusercontent.com'
-    });
-    const { name, email, picture } = ticket.getPayload();
-    const user = await User.findOne({ email });
     try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: '1005266927467-r75m0g9pn25q1vkob3hls1h1hvrq4981.apps.googleusercontent.com'
+        });
+        const { name, email, picture } = ticket.getPayload();
+        const user = await User.findOne({ email });
+        console.log(user)
         if (!user && email) {
             const newUser = new User();
             newUser.email = email;

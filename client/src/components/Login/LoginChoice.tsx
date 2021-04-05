@@ -1,26 +1,24 @@
 import React from 'react';
-import axios from 'axios';
 import GoogleLogin from 'react-google-login'
 
-const LoginChoice = () => {
+import UserMeta from '../UserMeta/UserMeta';
+import { login } from '../../slice/serviceSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser } from '../../slice/serviceSlice';
 
-    const handleLogin = async (googleData: any) => {
-        console.log(googleData)
-        await axios({
-            method: "POST",
-            url: "http://localhost:3001/auth/",
-            data: {
-                token: googleData.tokenId
-            },
-        }).then((res) => {
-            console.log('data', res.data)
-        }).catch((err) => {
-            console.log('err', err)
-        })
+const LoginChoice: React.FC = () => {
+    const dispatch = useDispatch();
+    const { service } = useSelector(selectUser);
+
+    const handleLogin = (googleData: any) => {
+        dispatch(login(googleData.tokenId));
     }
 
-    return (
-        <div>
+    const renderLogin = () => {
+        if (service.token) {
+            return <UserMeta />
+        }
+        return (
             <GoogleLogin
                 clientId="1005266927467-r75m0g9pn25q1vkob3hls1h1hvrq4981.apps.googleusercontent.com"
                 buttonText="Login"
@@ -28,7 +26,12 @@ const LoginChoice = () => {
                 onFailure={handleLogin}
                 cookiePolicy={'single_host_origin'}
             />
+        )
+    }
 
+    return (
+        <div>
+            {renderLogin()}
         </div>
     )
 }
