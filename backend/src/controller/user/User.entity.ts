@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToMany, JoinTable } from "typeorm";
+import { Movie } from "../movie/Movie.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -14,5 +15,9 @@ export class User extends BaseEntity {
 
     @Column()
     picture: string;
+
+    @ManyToMany(() => Movie)
+    @JoinTable()
+    favorites: Movie[];
 
 }
