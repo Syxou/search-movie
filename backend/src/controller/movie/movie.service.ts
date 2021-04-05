@@ -80,13 +80,11 @@ export const saveFavorite = async (user: User, movie: Movie) => {
     return await AddFavoriteToUser(existUser, existMovie);
 }
 
-export const removeFavorite = async (email: string, movie: Movie) => {
+export const removeFavorite = async (email: string, imdbID: string) => {
     const userRepo = getCustomRepository(UserRepository);
     const existUser = await User.findOne({ email }, {
         relations: ['favorites']
     });
-    console.log(existUser)
-    console.log(movie)
     if (!existUser) {
         return {
             error: true,
@@ -94,7 +92,7 @@ export const removeFavorite = async (email: string, movie: Movie) => {
         }
     }
     try {
-        existUser.favorites = existUser.favorites.filter((f) => f.imdbID !== movie.imdbID)
+        existUser.favorites = existUser.favorites.filter((f) => f.imdbID !== imdbID)
         const deleted = await userRepo.save(existUser);
         console.log(deleted)
         return deleted;
@@ -106,13 +104,13 @@ export const removeFavorite = async (email: string, movie: Movie) => {
 }
 
 
-export const getFavorites = async (email: string): Promise<User[] | number> => {
+export const getFavorites = async (email: string): Promise<User | number> => {
     const userRepo = getCustomRepository(UserRepository);
     try {
         return await userRepo.createQueryBuilder('user')
             .where({ email: email })
             .innerJoinAndSelect('user.favorites', 'favorites')
-            .getMany();
+            .getOne();
     } catch (error) {
         console.log(error)
         return 500;

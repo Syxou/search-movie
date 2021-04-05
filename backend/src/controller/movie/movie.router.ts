@@ -35,9 +35,9 @@ router.post('/favorite', tokenValidate, async (req: Request, res: Response) => {
 
 router.delete('/favorite', tokenValidate, async (req: Request, res: Response) => {
     const { email } = req.payload;
-    const movie = req.body;
+    const { imdbID } = req.body;
 
-    const deleted = await removeFavorite(email, movie);
+    const deleted = await removeFavorite(email, imdbID);
     if (typeof deleted === "number") {
         res.sendStatus(deleted)
     }
