@@ -1,7 +1,23 @@
-# Awesome Project Build with TypeORM
+# Search Movie 
 
-Steps to run this project:
 
-1. Run `npm i` command
-2. Setup database settings inside `ormconfig.json` file
-3. Run `npm start` command
+## Run locally
+
+1. Clone this repository
+1. Run from root dir
+
+```
+docker-compose up --build
+```
+
+
+## Stack
+Backend:
+  * Node.js
+  * Express.js
+  * Typeorm
+  * Mysql
+
+Client:
+  * ReactJS
+  * Reduxjs/toolkit
