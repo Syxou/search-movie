@@ -4,18 +4,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Card from './components/Card/Card';
 import Nav from './components/Nav/Nav';
-import { selectMovies, getFavorites, removeFavorite, addFavorite, Favorites } from './slice/moviesSlice';
-import { heckLogin } from './slice/serviceSlice';
+import { selectMovies, getFavorites, removeFavorite, nextPage, prevPage, addFavorite, Favorites } from './slice/moviesSlice';
+import { heckLogin, selectUser } from './slice/serviceSlice';
 
 
 const App: React.FC = () => {
     const dispatch = useDispatch();
-    const { movies, favorites } = useSelector(selectMovies);
+    const { movies, favorites, page } = useSelector(selectMovies);
+    const { service } = useSelector(selectUser);
 
     useEffect(() => {
         dispatch(heckLogin())
-        dispatch(getFavorites())
     }, [dispatch])
+
+    useEffect(() => {
+        dispatch(getFavorites())
+    }, [service, dispatch])
 
     const handleRemoveFavorite = (movie: Favorites) => {
         dispatch(removeFavorite(movie.imdbID))
@@ -24,26 +28,42 @@ const App: React.FC = () => {
     const handleAddFavorite = (movie: Favorites) => {
         dispatch(addFavorite(movie))
     }
-
+    const handleNextPage = () => {
+        dispatch(nextPage())
+    }
+    const handlePrevPage = () => {
+        dispatch(prevPage())
+    }
     return (
         <main>
             <Nav />
             <Main>
-                <MovieGrid>
-                    {movies.Search?.map((m: any,) => (
-                        <Card
-                            imdbID={m.imdbID}
-                            key={m.imdbID}
-                            title={m.Title}
-                            year={m.Year}
-                            poster={m.Poster}
-                            onClickFollow={(movie) => handleAddFavorite(movie)}
-                        />
-                    ))}
-                </MovieGrid>
-                {favorites && (
-                    <FavoriteGrid>
-                        <FavoriteTitle>Favorites</FavoriteTitle>
+                <MovieWrap>
+                    <MovieGrid>
+                        {movies.Search?.map((m: any,) => (
+                            <Card
+                                imdbID={m.imdbID}
+                                key={m.imdbID}
+                                title={m.Title}
+                                year={m.Year}
+                                poster={m.Poster}
+                                showFavorite={service.token ? true : false}
+                                onClickFollow={(movie) => handleAddFavorite(movie)}
+                            />
+                        ))}
+                    </MovieGrid>
+                    {movies.Search?.length && (
+                        <PaginationWrap>
+                            {page > 1 ? (<PaginationButton onClick={handlePrevPage}>Prev</PaginationButton>) : null}
+                            <PaginationButton onClick={handleNextPage}>Next</PaginationButton>
+                        </PaginationWrap>
+
+                    )}
+                    {console.log(page < 1)}
+                </MovieWrap>
+                {favorites?.length
+                    ? (<FavoriteGrid>
+                        <FavoriteTitle>Favorites ({favorites.length})</FavoriteTitle>
                         {favorites.map((f) => (
                             <Card
                                 imdbID={f.imdbID}
@@ -51,11 +71,12 @@ const App: React.FC = () => {
                                 title={f.title}
                                 year={f.year}
                                 poster={f.poster}
+                                showFavorite={service.token ? true : false}
                                 onClickFollow={(id) => handleRemoveFavorite(id)}
                             />
                         ))}
-                    </FavoriteGrid>
-                )
+                    </FavoriteGrid>)
+                    : null
                 }
             </Main>
         </main>
@@ -67,14 +88,41 @@ const Main = styled.section`
     display: flex;
 `;
 
+const PaginationWrap = styled.div`
+    display: flex;
+    width:100%;
+    justify-content:center;
+    margin-top: 15px;
+`;
+
+const PaginationButton = styled.div`
+    margin-top: 10px;
+    width: 44px;
+    height: 44px;
+    border: solid 2px #BC9CFF;
+    border-radius: 22px;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 10px;
+
+`;
 const MovieGrid = styled.div`
-    width: 100%;
-    padding: 0 1rem;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(325px, 1fr));
     grid-template-rows:repeat(auto-fill, 325px);
     grid-gap: 1rem;
+    height: calc(100vh - 130px);
+    overflow-x: scroll;
 `;
+
+const MovieWrap = styled.div`
+    width: 100%;
+    padding: 0 1rem;
+`;
+
 const FavoriteTitle = styled.h2`
     margin: 0 auto;
 `;

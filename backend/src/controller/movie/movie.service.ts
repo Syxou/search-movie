@@ -5,19 +5,21 @@ import { User } from "../user/User.entity";
 import UserRepository from "../user/User.repository";
 import { Movie } from "./Movie.entity";
 
-export const searchMovies = async (search: string) => {
-    const movies = await searchMoviesInApi(search);
-    return movies;
+interface IError {
+    error: boolean,
+    message: string
 }
 
-const searchMoviesInApi = async (search: string) => {
+export const searchMovies = async (search: string, page: number) => {
+    console.log(page)
     return axios({
         method: 'get',
-        url: `http://www.omdbapi.com/?apikey=d9667a10&s=${search}&type=movie`,
+        url: `http://www.omdbapi.com/?apikey=d9667a10&s=${search}&type=movie&page=${page}&`,
     })
         .then((res) => res.data)
         .catch((err) => err.response)
 }
+
 
 export const addMovie = async (movie: Movie): Promise<Movie | false> => {
     try {
@@ -54,22 +56,35 @@ export const AddFavoriteToUser = async (user: User, movie: Movie) => {
         return await userRepo.save(userWithRelation);
     } catch (error) {
         console.log(error)
-        return 500
+        return {
+            error: true,
+            message: "error save",
+        }
     }
 }
 
 
-export const saveFavorite = async (user: User, movie: Movie) => {
-    const existUser = await User.findOne({ email: user.email });
-    console.log(existUser)
+
+export const saveFavorite = async (user: User, movie: Movie): Promise<User | IError> => {
+    const existUser = await User.findOne({ email: user.email }, {
+        relations: ['favorites']
+    });
+
     if (!existUser) {
         return {
             error: true,
-            message: 'User not exist'
+            message: 'User not exist',
+        }
+    }
+    const thisMovieInFavorites = existUser.favorites.findIndex((f) => f.imdbID === movie.imdbID);
+    console.log(thisMovieInFavorites)
+    if (thisMovieInFavorites >= 0) {
+        return {
+            error: true,
+            message: 'Favorite exist',
         }
     }
     const existMovie = await Movie.findOne({ imdbID: movie.imdbID })
-    console.log(existMovie)
     if (!existMovie) {
         console.log('newMovie', movie)
         const newMovie = await addMovie(movie);

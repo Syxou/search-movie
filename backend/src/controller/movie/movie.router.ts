@@ -6,10 +6,13 @@ import { User } from "../user/User.entity";
 const router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
-    const { s } = req.query;
-    console.log(s)
-    if (s) {
-        res.send(await searchMovies(s as string))
+    const { s, page } = req.query;
+    console.log(s, page)
+    if (typeof page === 'string') {
+        if (s) {
+            res.send(await searchMovies(s as string, parseInt(page)))
+            return;
+        }
     }
     res.send([])
 });
@@ -30,6 +33,7 @@ router.post('/favorite', tokenValidate, async (req: Request, res: Response) => {
     const movie = req.body;
 
     const save = await saveFavorite(payload as User, movie);
+
     res.send(save)
 });
 
@@ -41,6 +45,7 @@ router.delete('/favorite', tokenValidate, async (req: Request, res: Response) =>
     if (typeof deleted === "number") {
         res.sendStatus(deleted)
     }
+
     res.send(deleted)
 });
 

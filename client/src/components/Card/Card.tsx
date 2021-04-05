@@ -11,6 +11,7 @@ interface CardProps extends CardPoster {
     imdbID: string,
     title: string,
     year: string,
+    showFavorite?: boolean,
     onClickFollow?: (item: IFavorites) => void,
 }
 
@@ -19,24 +20,32 @@ const Card: React.FC<CardProps> = ({
     title,
     year,
     poster,
+    showFavorite = false,
     onClickFollow,
     ...rest
 }) => {
+    console.log(showFavorite)
     return (
         <CardWrap
             {...rest}
             poster={poster}
         >
-            <CardContent>
+            <div>
                 <h3>{title}</h3>
                 <p>{year}</p>
-                <Favorites onClick={() => onClickFollow
-                    ? onClickFollow({ imdbID, title, year, poster } as IFavorites)
-                    : null}
-                >
-                    <Icon />
-                </Favorites>
-            </CardContent>
+                {showFavorite
+                    ? (
+                        <Favorites onClick={() => onClickFollow
+                            ? onClickFollow({ imdbID, title, year, poster } as IFavorites)
+                            : null}
+                        >
+                            <Icon />
+                        </Favorites>
+                    )
+                    : null
+                }
+
+            </div>
         </CardWrap>
     )
 }
@@ -65,6 +74,8 @@ const CardWrap = styled.article<CardPoster>`
     border-radius: 7px;
     padding: 140px 40px 60px 40px;
     box-shadow: 0px 5px 15px rgba(31, 32, 65, 0.15);
+    background-size: cover;
+    background-position: center;
 
     h3{
         font-style: normal;
@@ -83,10 +94,6 @@ const CardWrap = styled.article<CardPoster>`
         color: rgba(255, 255, 255, 0.75);
         margin: 0;
     }
-`;
-
-const CardContent = styled.div`
-
 `;
 
 export default Card;
