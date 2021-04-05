@@ -10,6 +10,8 @@
 docker-compose up --build
 ```
 
+app url: http://localhost:3000/
+
 
 ## Stack
 Backend:
